@@ -1,3 +1,12 @@
-﻿  main.c
+﻿  main_blinky.c
 c:\work\freertos\freertos\source\include\task.h(2591): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
+c:\work\freertos\freertos\source\include\task.h(2591): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
+c:\work\freertos\freertos\source\include\task.h(2591): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(137): warning C4189: 'xTimerPeriod' : ローカル変数が初期化されましたが、参照されていません
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(167): warning C4127: 条件式が定数です。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(163): warning C4189: 'ulValueToSend' : ローカル変数が初期化されましたが、参照されていません
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(162): warning C4189: 'xBlockTime' : ローカル変数が初期化されましたが、参照されていません
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(161): warning C4101: 'xNextWakeTime' : ローカル変数は 1 度も使われていません。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(186): warning C4127: 条件式が定数です。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(181): warning C4101: 'ulReceivedValue' : ローカル変数は 1 度も使われていません。
   WIN32.vcxproj -> C:\work\FreeRTOS\FreeRTOS\Demo\WIN32-MSVC\.\Debug\RTOSDemo.exe
