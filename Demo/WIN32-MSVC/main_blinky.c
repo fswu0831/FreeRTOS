@@ -171,7 +171,24 @@ static void producer( void *pvParameters )
 
 	while(1)
 	{
-		printf("task1");
+		if (sem_empty != NULL) {
+			if (xSemaphoreTake(sem_empty, (TickType_t)10) == pdTRUE) {
+				if (mutex != NULL) {
+					if (xSemaphoreTake(mutex, (TickType_t)10) == pdTRUE){
+						//insert item
+						printf("producer");
+						xSemaphoreGive(mutex);
+					}
+
+				}
+				xSemaphoreGive(sem_empty);
+			}
+			
+		}
+		else {
+			printf("don get semaphore\n");
+		}
+		
 		vTaskDelay(100);
 		
 		// add a semaphore
