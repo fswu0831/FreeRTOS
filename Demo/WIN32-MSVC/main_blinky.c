@@ -93,12 +93,12 @@ static void producer( void *pvParameters )
 				if (mutex != NULL) {
 					if (xSemaphoreTake(mutex, (TickType_t)10) == pdTRUE){
 						//insert item
-						printf("producer %lf\n",sem_empty);
+						printf("producer %d\n",sem_empty);
 						xSemaphoreGive(mutex);
 					}
 
 				}
-				xSemaphoreGive(sem_empty);
+				xSemaphoreGive(sem_full);
 			}
 			
 		}
@@ -132,7 +132,7 @@ static void consumer( void *pvParameters )
 					}
 
 				}
-				xSemaphoreGive(sem_full);
+				xSemaphoreGive(sem_empty);
 			}
 
 		}
