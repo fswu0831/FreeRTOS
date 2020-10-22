@@ -9,6 +9,9 @@
 #include "timers.h"
 #include "semphr.h"
 
+#define LOG_FILE     "LOG/log.txt"  
+FILE* log_file;
+
 /* Priorities at which the tasks are created. */
 #define mainQUEUE_RECEIVE_TASK_PRIORITY		( tskIDLE_PRIORITY + 2 )
 #define	mainQUEUE_SEND_TASK_PRIORITY		( tskIDLE_PRIORITY + 2 )
@@ -33,6 +36,7 @@ queue send software timer respectively. */
  */
 static void producer( void *pvParameters );
 static void consumer( void *pvParameters );
+void LOG_PRINT(char log_txt[256], ...);
 //static void consumer2(void* pvParameters);
 
 /*
@@ -55,6 +59,10 @@ static SemaphoreHandle_t sem_empty;
 static SemaphoreHandle_t sem_full;
 static SemaphoreHandle_t mutex;
 static int count = 0;
+
+static int empty = 5;
+static int full = 0;
+static int mu = 0;
 /*-----------------------------------------------------------*/
 
 /*** SEE THE COMMENTS AT THE TOP OF THIS FILE ***/
@@ -80,20 +88,6 @@ void main_blinky( void )
 	sem_full = xSemaphoreCreateCounting(N,0);
 	mutex = xSemaphoreCreateMutex();
 
-	printf("%c\n", sem_empty);
-	printf("%s\n", sem_empty);
-	printf("%d\n", sem_empty);
-	printf("%u\n", sem_empty);	
-	printf("%o\n", sem_empty);
-	printf("%x\n", sem_empty);
-	printf("%f\n", sem_full);
-	printf("%e\n", sem_empty);
-	printf("%g\n", sem_empty);
-	printf("%ld\n", sem_empty);
-	printf("%lu\n", sem_empty);
-	printf("%lo\n", sem_empty);
-	printf("%lx\n", sem_empty);
-	printf("%lf\n", sem_full);
 	/* Start the tasks and timer running. */
 	vTaskStartScheduler();
 
@@ -109,36 +103,34 @@ static void producer( void *pvParameters )
 	{
 		if (sem_empty != NULL) {
 			if (xSemaphoreTake(sem_empty, NULL) == pdTRUE) {
-				printf("producer take sem_empty/ ");
+				empty--;
 				if (mutex != NULL) {
 					if (xSemaphoreTake(mutex, NULL) == pdTRUE){
-						printf("producer take mutex/ ");
 						//insert item
 						 buffer++;
-						
-						printf("producer give mutex /");
+						 mu++;
+						 printf("pr2-buffer:%d empty:%d full:%d mutex:%d \n", buffer, empty, full, mu);
 						xSemaphoreGive(mutex);
+						mu--;
 					}
 					else {
 						xSemaphoreGive(sem_empty);
-						printf("producer dont get mutex /");
+						empty--;
 					}
 
 				}
-				printf("producer give sem_full/");
 				xSemaphoreGive(sem_full);
+				full++;
 			}
 			else {
-				printf("producer don't get sem_empty/");
 			}
 		}
 	
-		//printf("finish producer\n");
-		//Sleep(100);
-		//vTaskDelay(10);
 		
 		// add a semaphore
-		printf("buffer:%d \n", buffer);
+		printf("pro-buffer:%d empty:%d full:%d mutex:%d \n", buffer,empty,full,mu);
+		LOG_PRINT(buffer);
+		vTaskDelay(10);
 	}
 }
 
@@ -151,32 +143,33 @@ static void consumer( void *pvParameters )
 
 		if (sem_full != NULL) {
 			if (xSemaphoreTake(sem_full, NULL) == pdTRUE) { //(TickType_t)0) == pdTRUE
-				printf("cunsumer take sem_full/ ");
+				full--;
 				if (mutex != NULL) {
 					if (xSemaphoreTake(mutex, NULL) == pdTRUE) {
 						buffer--;
-						printf("consumer:%d/ ",buffer);
-						printf("consumer give mutex/ ");
+						mu++;
+						printf("co2-buffer:%d empty:%d full:%d mutex:%d \n", buffer, empty, full, mu);
 						xSemaphoreGive(mutex);
+						mu--;
 					}
 					else {
 						xSemaphoreGive(sem_full);
-						printf("consumer dont get mutex/");
+						full--;
 					}
 
 
 				}
-				printf("consumer give sem_empty/");
 				xSemaphoreGive(sem_empty);
+				empty++;
 			}
 			else {
-				printf("consumer don't get sem_full/");
+				
 			}
 
 		}
-		printf("buffer:%d \n ", buffer);
-		//printf("finish consumer\n");
-		//vTaskDelay(10);
+		printf("con-buffer:%d empty:%d full:%d mutex:%d \n", buffer, empty, full, mu);
+		LOG_PRINT(buffer);
+		vTaskDelay(10);
 	}
 }
 
@@ -214,3 +207,27 @@ static void consumer( void *pvParameters )
 	}
 }
 */
+
+void LOG_PRINT(char log_txt[256], ...)
+{
+
+	time_t timer;
+	struct tm* date;
+	char str[256];
+
+	/* éûä‘éÊìæ */
+	timer = time(NULL);
+	date = localtime(&timer);
+	strftime(str, sizeof(str), "[%Y/%x %H:%M:%S] ", date);
+
+
+
+	/* ï∂éöóÒåãçá */
+	strcat(str, log_txt);
+
+	fputs(str, log_file);
+	fclose(log_file);
+
+	return;
+
+}
