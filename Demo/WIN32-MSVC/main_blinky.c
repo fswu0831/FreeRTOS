@@ -36,7 +36,7 @@ queue send software timer respectively. */
  */
 static void producer( void *pvParameters );
 static void consumer( void *pvParameters );
-void LOG_PRINT(char log_txt[256], ...);
+void array_push(void* ptr, int size, size_t unit_size, void* item);
 //static void consumer2(void* pvParameters);
 
 /*
@@ -208,26 +208,9 @@ static void consumer( void *pvParameters )
 }
 */
 
-void LOG_PRINT(char log_txt[256], ...)
-{
-
-	time_t timer;
-	struct tm* date;
-	char str[256];
-
-	/* éûä‘éÊìæ */
-	timer = time(NULL);
-	date = localtime(&timer);
-	strftime(str, sizeof(str), "[%Y/%x %H:%M:%S] ", date);
-
-
-
-	/* ï∂éöóÒåãçá */
-	strcat(str, log_txt);
-
-	fputs(str, log_file);
-	fclose(log_file);
-
-	return;
-
+void* array_push(void* ptr, int size, size_t unit_size, void* item) {
+	void* adr = malloc(unit_size * (size + 1));
+	memcpy(adr, ptr, unit_size * size);
+	memcpy((char*)adr + (unit_size * size), item, unit_size);
+	return(adr);
 }
