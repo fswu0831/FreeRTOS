@@ -2,21 +2,12 @@
 c:\work\freertos\freertos\source\include\task.h(2591): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
 c:\work\freertos\freertos\source\include\task.h(2591): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
 c:\work\freertos\freertos\source\include\task.h(2591): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(105): warning C4047: '関数' : 間接参照のレベルが 'TickType_t' と 'void *' で異なっています。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(105): warning C4024: 'xQueueSemaphoreTake' : の型が 2 の仮引数および実引数と異なります。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(108): warning C4047: '関数' : 間接参照のレベルが 'TickType_t' と 'void *' で異なっています。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(108): warning C4024: 'xQueueSemaphoreTake' : の型が 2 の仮引数および実引数と異なります。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(132): warning C4047: '関数' : 間接参照のレベルが 'char *' と 'int' で異なっています。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(132): warning C4024: 'LOG_PRINT' : の型が 1 の仮引数および実引数と異なります。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(141): warning C4127: 条件式が定数です。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(145): warning C4047: '関数' : 間接参照のレベルが 'TickType_t' と 'void *' で異なっています。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(145): warning C4024: 'xQueueSemaphoreTake' : の型が 2 の仮引数および実引数と異なります。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(148): warning C4047: '関数' : 間接参照のレベルが 'TickType_t' と 'void *' で異なっています。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(148): warning C4024: 'xQueueSemaphoreTake' : の型が 2 の仮引数および実引数と異なります。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(171): warning C4047: '関数' : 間接参照のレベルが 'char *' と 'int' で異なっています。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(171): warning C4024: 'LOG_PRINT' : の型が 1 の仮引数および実引数と異なります。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(219): warning C4013: 関数 'time' は定義されていません。int 型の値を返す外部関数と見なします。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(220): warning C4013: 関数 'localtime' は定義されていません。int 型の値を返す外部関数と見なします。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(220): warning C4047: '=' : 間接参照のレベルが 'tm *' と 'int' で異なっています。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(221): warning C4013: 関数 'strftime' は定義されていません。int 型の値を返す外部関数と見なします。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(111): warning C4047: '関数' : 間接参照のレベルが 'TickType_t' と 'void *' で異なっています。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(111): warning C4024: 'xQueueSemaphoreTake' : の型が 2 の仮引数および実引数と異なります。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(114): warning C4047: '関数' : 間接参照のレベルが 'TickType_t' と 'void *' で異なっています。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(114): warning C4024: 'xQueueSemaphoreTake' : の型が 2 の仮引数および実引数と異なります。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(151): warning C4047: '関数' : 間接参照のレベルが 'TickType_t' と 'void *' で異なっています。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(151): warning C4024: 'xQueueSemaphoreTake' : の型が 2 の仮引数および実引数と異なります。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(154): warning C4047: '関数' : 間接参照のレベルが 'TickType_t' と 'void *' で異なっています。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(154): warning C4024: 'xQueueSemaphoreTake' : の型が 2 の仮引数および実引数と異なります。
   WIN32.vcxproj -> C:\work\FreeRTOS\FreeRTOS\Demo\WIN32-MSVC\.\Debug\RTOSDemo.exe

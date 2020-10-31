@@ -63,6 +63,12 @@ static int count = 0;
 static int empty = 5;
 static int full = 0;
 static int mu = 0;
+
+static int work_num_consumer=10;
+static int work_num_producer = 10;
+
+static int pro_count;
+static int con_count;
 /*-----------------------------------------------------------*/
 
 /*** SEE THE COMMENTS AT THE TOP OF THIS FILE ***/
@@ -98,8 +104,8 @@ static void producer( void *pvParameters )
 {
 	( void ) pvParameters;
 	
-
-	for(;;)
+	
+	for(pro_count=0; pro_count <work_num_producer; pro_count++)
 	{
 		if (sem_empty != NULL) {
 			if (xSemaphoreTake(sem_empty, NULL) == pdTRUE) {
@@ -129,7 +135,7 @@ static void producer( void *pvParameters )
 		
 		// add a semaphore
 		printf("pro-buffer:%d empty:%d full:%d mutex:%d \n", buffer,empty,full,mu);
-		LOG_PRINT(buffer);
+		//LOG_PRINT(buffer);
 		vTaskDelay(10);
 	}
 }
@@ -138,7 +144,7 @@ static void producer( void *pvParameters )
 static void consumer( void *pvParameters )
 {
 	( void ) pvParameters;
-	while(1)
+	for (con_count = 0; con_count < work_num_consumer; con_count++)
 	{
 
 		if (sem_full != NULL) {
@@ -168,7 +174,7 @@ static void consumer( void *pvParameters )
 
 		}
 		printf("con-buffer:%d empty:%d full:%d mutex:%d \n", buffer, empty, full, mu);
-		LOG_PRINT(buffer);
+		//LOG_PRINT(buffer);
 		vTaskDelay(10);
 	}
 }
@@ -208,9 +214,12 @@ static void consumer( void *pvParameters )
 }
 */
 
+/*
+
 void* array_push(void* ptr, int size, size_t unit_size, void* item) {
 	void* adr = malloc(unit_size * (size + 1));
 	memcpy(adr, ptr, unit_size * size);
 	memcpy((char*)adr + (unit_size * size), item, unit_size);
 	return(adr);
 }
+*/
