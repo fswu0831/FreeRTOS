@@ -71,25 +71,33 @@ static int work_num=100; //消費者のループ回数
 //static int work_num_producer = 100; //生産者のループ回数
 
 static int count=1;
+static int i = 0;//CSV保存のための変数
 
 static char myTxBuff[5] ;
 static char myRxBuff[5] ;
 
 
 /*---------CSVに保存するための関数など------------*/
-
+/*
 typedef struct {
-	double x, y, z;
+	int x, y;
 }Vector;
 
-static void save_csv(data) {
+static Vector* ary = (Vector*)malloc(sizeof(Vector) * 100);
+
+static void save_csv(void) {
 	FILE* fp;
 	if ((fp = fopen("data.csv", "w")) != NULL) {
-		fprintf(fp, "%s", data);
+		for (i; i < work_num; i++) {
+			fprintf(fp, "%d,%d\n", ary[i].x, ary[i].y);
+		}
+		fclose(fp);
 	}
-	fclose(fp);
+	return 0;
 }
 
+
+*/
 /*---------CSVに保存するための関数など------------*/
 
 
