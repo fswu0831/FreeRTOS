@@ -78,7 +78,8 @@ static BaseType_t xTraceRunning = pdTRUE;
 
 int main( void )
 {
-
+	static int i = 1;
+	static int kernel_loop_num = 3;
 	prvInitialiseHeap();
 
 
@@ -86,7 +87,9 @@ int main( void )
 
 	#if ( mainCREATE_SIMPLE_BLINKY_DEMO_ONLY == 1 )
 	{
-		main_blinky();
+		for (i; i <= kernel_loop_num; i++) {
+			main_blinky();
+		}
 	}
 	#else
 	{
