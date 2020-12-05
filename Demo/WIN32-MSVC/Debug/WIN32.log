@@ -2,6 +2,6 @@
 c:\work\freertos\freertos\source\include\task.h(2591): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
 c:\work\freertos\freertos\source\include\task.h(2591): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
 c:\work\freertos\freertos\source\include\task.h(2591): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(108): warning C4127: 条件式が定数です。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(132): warning C4127: 条件式が定数です。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(126): warning C4127: 条件式が定数です。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(157): warning C4127: 条件式が定数です。
   WIN32.vcxproj -> C:\work\FreeRTOS\FreeRTOS\Demo\WIN32-MSVC\.\Debug\RTOSDemo.exe

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
-#include <string.h>
+
 
 /* Kernel includes. */
 #include "FreeRTOS.h"
@@ -11,6 +11,10 @@
 #include "semphr.h"
 #include "queue.h"
 #include "message_buffer.h"
+#include "list.h"
+
+#define BUFFER_SIZE ( ( unsigned portSHORT ) 512 ) 
+static signed portCHAR pcWriteBuffer1[BUFFER_SIZE] = { 0 };
 
 #define LOG_FILE     "LOG/log.txt"  
 FILE* log_file;
@@ -58,31 +62,45 @@ static const size_t xMessageBufferSizeBytes = 100;
 static int i = 1;//ループ用の関数
 static int j = 1;
 
-static char T[10];
+static int COUNT[SEND_TASK_NUM + RECEIVE_TASK_NUM + 1];
+
+static char T[200];
+static int k;
+
+static int NAME[100];
 
 
 static void create_object(void) {
 	/* Start the two tasks as described in the comments at the top of this
 	file. */
+	//static int index_send[i];
+	//static int index_receive[j];
 
 	for (i; i <= SEND_TASK_NUM; i++) {
-		sprintf(T, "T%d", i);
-		xTaskCreate(RECEIVE_TASK, T , configMINIMAL_STACK_SIZE, NULL, main_TASK_PRIORITY_HIGH, NULL);
+		//T= (char*)i;
+		k = sprintf(T, "%d", i);
+		printf("%s\n",T);
+		xTaskCreate(RECEIVE_TASK, T, configMINIMAL_STACK_SIZE, NULL, main_TASK_PRIORITY_HIGH, NULL);
 		
 	}
 
 	for (j; j <= RECEIVE_TASK_NUM; j++) {
-		sprintf(T, "T%d", j+SEND_TASK_NUM);
+		k = sprintf(T, "%d", i);
+		printf("%s\n", T);
 		xTaskCreate(SEND_TASK, T , configMINIMAL_STACK_SIZE, NULL, main_TASK_PRIORITY_HIGH, NULL);
 	}
 
 	xMessageBuffer = xMessageBufferCreate(xMessageBufferSizeBytes);
+	for (i = 0; i <= sizeof(COUNT) / sizeof(int); i++) {
+		COUNT[i] = 0;
+	}
 }
 
 
 void main_blinky( void )
 {
 		create_object();
+		//vTaskStartTrace(pcWriteBuffer1, BUFFER_SIZE);
 		vTaskStartScheduler();
 		printf("finish this kernel\n");
 }
@@ -103,9 +121,13 @@ const TickType_t xBlockTime = pdMS_TO_TICKS(20);
 static void SEND_TASK( void *pvParameters )
 {
 	( void ) pvParameters;
+	
 
 	while(1)
 	{
+		TaskHandle_t tskHand_send;
+		tskHand_send = xTaskGetCurrentTaskHandle();
+
 		xBytesSent = xMessageBufferSend(xMessageBuffer, (void *)ucArrayToSend, sizeof(ucArrayToSend), x100ms);
 
 		if (xBytesSent != sizeof(ucArrayToSend)) {
@@ -113,7 +135,11 @@ static void SEND_TASK( void *pvParameters )
 			printf("not enough send spase\n");
 		}
 		else {
-			printf("send:%d\n",xBytesSent);
+			atoi(pcTaskGetName(tskHand_send));
+			printf("SEND TASK NAME:%s,\n", pcTaskGetName(tskHand_send));
+			printf("Buffer Pointer:%d,\n", &xMessageBuffer);
+			COUNT[NAME[1]]+=1;
+			printf("INDEX COUNT:%d\n", COUNT[atoi(pcTaskGetName(tskHand_send))]);
 		}
 
 		vTaskDelay(10);
@@ -130,11 +156,18 @@ static void RECEIVE_TASK( void *pvParameters )
 
 	while (1)
 	{
+		TaskHandle_t tskHand_res;
+		tskHand_res = xTaskGetCurrentTaskHandle();
+
 		xReceivedBytes = xMessageBufferReceive(xMessageBuffer, (void*)ucRxData, sizeof(ucRxData), xBlockTime);
 
 		if (xReceivedBytes>0) {
 			//dont have enough space
-			printf("rece:%d\n", ucRxData[1]);
+			//dont have enough space
+			printf("RES TASK NAME:%s,\n", pcTaskGetName(tskHand_res));
+			printf("Buffer Pointer:%d,\n", &xMessageBuffer);
+			COUNT[atoi(pcTaskGetName(tskHand_res))] += 1;
+			printf("INDEX COUNT:%d\n", COUNT[atoi(pcTaskGetName(tskHand_res))]);;
 		}
 		else {
 			printf("ERROR\n");
@@ -144,3 +177,5 @@ static void RECEIVE_TASK( void *pvParameters )
 	}
 	//vTaskEndScheduler();
 }
+//回数取得用
+//動いているバッファを取得
