@@ -163,6 +163,9 @@
     <ClCompile Include="..\Common\Minimal\TaskNotifyArray.c">
       <Filter>Demo App Source\Full_Demo\Common Demo Tasks</Filter>
     </ClCompile>
+    <ClCompile Include="output.c">
+      <Filter>FreeRTOS Source\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FreeRTOSConfig.h">
@@ -212,6 +215,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\program files (x86)\microsoft sdks\windows\v7.0a\include\basetsd.h">
       <Filter>Configuration Files</Filter>
+    </ClInclude>
+    <ClInclude Include="csv.h">
+      <Filter>Configuration Files</Filter>
+    </ClInclude>
+    <ClInclude Include="output.h">
+      <Filter>FreeRTOS Source\Include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
