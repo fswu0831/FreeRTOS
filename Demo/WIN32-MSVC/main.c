@@ -85,9 +85,7 @@ int main( void )
 
 	#if ( mainCREATE_SIMPLE_BLINKY_DEMO_ONLY == 1 )
 	{
-\
 		main_blinky();
-		export_csv();//シーケンスの出力
 
 	}
 	#else
