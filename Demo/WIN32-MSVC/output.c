@@ -54,12 +54,12 @@ extern void append_row(StreamBufferHandle_t xStreamBuffer,char event_type[6], Ta
 
 	incrementCOUNT(index);
 
-	if (strcmp(event_type, SEND_EVENT) == 0) {
+	if (strcmp(event_type, RECV_EVENT) == 0) {
 		Qr[r_count] = Substitution(pcTaskGetName(xTaskHandle), xStreamBuffer, event_type, getCOUNT(index));
 		r_count++;
 
 	}
-	else if (strcmp(event_type, RECV_EVENT) == 0) {
+	else if (strcmp(event_type, SEND_EVENT) == 0) {
 		Qs[s_count] = Substitution(pcTaskGetName(xTaskHandle), xStreamBuffer, event_type, getCOUNT(index));
 		s_count++;
 	}
@@ -73,8 +73,8 @@ extern void export_csv(int SEND_TASK_NUM, int RECEIVE_TASK_NUM, int NUMVER) {
 	uint8_t i, j;
 
 
-	sprintf(FILE_NAME_1, "LOG/recv-task-%d-loop-%d.csv", SEND_TASK_NUM,NUMVER);
-	sprintf(FILE_NAME_2, "LOG/send-task-%d-loop-%d.csv", RECEIVE_TASK_NUM, NUMVER);
+	sprintf(FILE_NAME_1, "LOG2/recv-task-%d-loop-%d.csv", SEND_TASK_NUM,NUMVER);
+	sprintf(FILE_NAME_2, "LOG2/send-task-%d-loop-%d.csv", RECEIVE_TASK_NUM, NUMVER);
 
 	if ((fr = fopen(FILE_NAME_1, "w")) == NULL){
 		printf("receiveイベントのログの出力に失敗しました");

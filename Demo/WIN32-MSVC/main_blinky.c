@@ -16,7 +16,7 @@
 #include "output.h"
 
 #define BUFFER_SIZE ( ( unsigned portSHORT ) 512 ) 
-static signed portCHAR pcWriteBuffer1[BUFFER_SIZE] = { 10 };
+static signed portCHAR pcWriteBuffer1[BUFFER_SIZE] = { 100 };
 
 #define LOG_FILE     "LOG/log.txt"  
 FILE* log_file;
@@ -57,7 +57,8 @@ static TimerHandle_t xTimer = NULL;
 
 //static MessageBufferHandle_t xMessageBuffer;
 static MessageBufferHandle_t xMessageBuffer;
-static const size_t xMessageBufferSizeBytes = 1000;
+static MessageBufferHandle_t yMessageBuffer;
+static const size_t xMessageBufferSizeBytes = 2048;
 
 
 
@@ -94,6 +95,7 @@ static void create_object(void) {
 		printf(".");
 		k = sprintf(T, "%d", i);
 		xTaskCreate(RECEIVE_TASK, T, configMINIMAL_STACK_SIZE, NULL, main_TASK_PRIORITY_HIGH, NULL);
+		printf("%d", uxTaskGetNumberOfTasks());
 		
 	}
 
@@ -101,10 +103,12 @@ static void create_object(void) {
 		printf(".");
 		k = sprintf(T, "%d", j);
 		xTaskCreate(SEND_TASK, T , configMINIMAL_STACK_SIZE, NULL, main_TASK_PRIORITY_HIGH, NULL);
+		printf("%d", uxTaskGetNumberOfTasks());
 	}
 
 	xMessageBuffer = xMessageBufferCreate(xMessageBufferSizeBytes);
-
+	yMessageBuffer = xMessageBufferCreate(xMessageBufferSizeBytes);
+	//printf("%d", uxTaskGetNumberOfTasks());
 	for (i = 0; i <= SEND_TASK_NUM + RECEIVE_TASK_NUM + 1; i++) {
 		COUNT[i] = 0;
 	}
@@ -144,7 +148,7 @@ void main_blinky( void )
 
 /*メッセージバッファのための変数*/
 
-uint8_t ucArrayToSend[] = { 0,1,2 };
+uint8_t ucArrayToSend[] = { 0,1};
 size_t xBytesSent;
 static const TickType_t x100ms = pdMS_TO_TICKS(100);
 
@@ -154,13 +158,15 @@ size_t xReceivedBytes;
 const TickType_t xBlockTime = pdMS_TO_TICKS(20);
 
 static void check_task_num() {
+	printf("%d", uxTaskGetNumberOfTasks() - 2);
+	//printf("%s",vTaskList(pcWriteBuffer1));
 	//printf("Task Number:%d\n", uxTaskGetNumberOfTasks());
-	if (uxTaskGetNumberOfTasks()-2 == 1) {
-		printf("OK\n");
+	if (uxTaskGetNumberOfTasks()-2 <= 2) {
 		printf("kernel停止\n");
 		export_csv(SEND_TASK_NUM, RECEIVE_TASK_NUM,NUMVER);//シーケンスの出力
 		vTaskEndScheduler();
 	}
+	printf("-");
 }
 
 static void SEND_TASK( void *pvParameters )
@@ -170,10 +176,9 @@ static void SEND_TASK( void *pvParameters )
 
 	while(1)
 	{
-		TaskHandle_t tskHand_send, tskHand_res;
-		tskHand_send = xTaskGetCurrentTaskHandle();
-		
+		TaskHandle_t tskHand_send;
 
+		tskHand_send = xTaskGetCurrentTaskHandle();
 		xBytesSent = xMessageBufferSend(xMessageBuffer, (void *)ucArrayToSend, sizeof(ucArrayToSend), x100ms, tskHand_send);
 
 		if (xBytesSent != sizeof(ucArrayToSend)) {
@@ -185,29 +190,28 @@ static void SEND_TASK( void *pvParameters )
 		}
 
 
-		if (getCOUNT(atoi(pcTaskGetName(tskHand_send)))>= NUMVER) {
-			check_task_num();
-			vTaskDelete(tskHand_send);
-		}
 		printf(".");
-		vTaskDelay(0);
+		vTaskDelay(10);
 
-		tskHand_res = xTaskGetCurrentTaskHandle();
-		xReceivedBytes = xMessageBufferReceive(xMessageBuffer, (void*)ucRxData, sizeof(ucRxData), xBlockTime, tskHand_res);
+		tskHand_send = xTaskGetCurrentTaskHandle();
+		xBytesSent = xMessageBufferSend(yMessageBuffer, (void*)ucArrayToSend, sizeof(ucArrayToSend), x100ms, tskHand_send);
+		
 
-		if (xReceivedBytes > 0) {
-			//printf("send:%d\n",getCOUNT(atoi(pcTaskGetName(tskHand_res))));
+		if (xBytesSent != sizeof(ucArrayToSend)) {
+			//dont have enough space
+			printf("not enough send spase\n");
 		}
 		else {
-			printf("ERROR\n");
+			//printf("send:%d\n", getCOUNT(atoi(pcTaskGetName(tskHand_send))));
 		}
-
-		if (getCOUNT(atoi(pcTaskGetName(tskHand_res))) >= NUMVER) {
+		if (getCOUNT(atoi(pcTaskGetName(tskHand_send))) >= NUMVER) {
+			
 			check_task_num();
-			vTaskDelete(tskHand_res);
+			vTaskDelete(tskHand_send);
+			
 		}
 		printf(".");
-		vTaskDelay(0);
+		vTaskDelay(10);
 	}
 	
 	//vTaskEndScheduler();
@@ -218,12 +222,9 @@ static void RECEIVE_TASK( void *pvParameters )
 {
 	( void ) pvParameters;
 
-
-
 	while (1)
 	{
-		TaskHandle_t tskHand_send, tskHand_res;
-		
+		TaskHandle_t tskHand_res;
 		
 		tskHand_res = xTaskGetCurrentTaskHandle();
 		xReceivedBytes = xMessageBufferReceive(xMessageBuffer, (void*)ucRxData, sizeof(ucRxData), xBlockTime, tskHand_res);
@@ -235,31 +236,27 @@ static void RECEIVE_TASK( void *pvParameters )
 			printf("ERROR\n");
 		}
 
+		printf(".");
+		vTaskDelay(10);
+
+		tskHand_res = xTaskGetCurrentTaskHandle();
+		xReceivedBytes = xMessageBufferReceive(yMessageBuffer, (void*)ucRxData, sizeof(ucRxData), xBlockTime, tskHand_res);
+
+		if (xReceivedBytes > 0) {
+			//printf("send:%d\n",getCOUNT(atoi(pcTaskGetName(tskHand_res))));
+		}
+		else {
+			printf("ERROR\n");
+		}
+
+
 		if (getCOUNT(atoi(pcTaskGetName(tskHand_res))) >= NUMVER) {
+			
 			check_task_num();
 			vTaskDelete(tskHand_res);
 		}
 		printf(".");
-		vTaskDelay(0);
-
-		tskHand_send = xTaskGetCurrentTaskHandle();
-		xBytesSent = xMessageBufferSend(xMessageBuffer, (void*)ucArrayToSend, sizeof(ucArrayToSend), x100ms, tskHand_send);
-
-		if (xBytesSent != sizeof(ucArrayToSend)) {
-			//dont have enough space
-			printf("not enough send spase\n");
-		}
-		else {
-			//printf("send:%d\n", getCOUNT(atoi(pcTaskGetName(tskHand_send))));
-		}
-
-
-		if (getCOUNT(atoi(pcTaskGetName(tskHand_send))) >= NUMVER) {
-			check_task_num();
-			vTaskDelete(tskHand_send);
-		}
-		printf(".");
-		vTaskDelay(0);
+		vTaskDelay(10);
 
 
 	}

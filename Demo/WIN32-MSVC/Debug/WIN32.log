@@ -1,10 +1,12 @@
-﻿  main_blinky.c
+﻿  output.c
 c:\work\freertos\freertos\source\include\task.h(2591): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
 c:\work\freertos\freertos\source\include\task.h(2591): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
 c:\work\freertos\freertos\source\include\task.h(2591): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(100): warning C4244: '=' : 'int' から 'uint8_t' への変換です。データが失われる可能性があります。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(122): warning C4047: '=' : 間接参照のレベルが 'char' と 'char [2]' で異なっています。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(161): warning C4013: 関数 'export_csv' は定義されていません。int 型の値を返す外部関数と見なします。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(171): warning C4127: 条件式が定数です。
-c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(223): warning C4127: 条件式が定数です。
+c:\work\freertos\freertos\demo\win32-msvc\output.c(52): warning C4244: '初期化中' : 'int' から 'uint8_t' への変換です。データが失われる可能性があります。
+c:\work\freertos\freertos\demo\win32-msvc\output.c(55): warning C4013: 関数 'incrementCOUNT' は定義されていません。int 型の値を返す外部関数と見なします。
+c:\work\freertos\freertos\demo\win32-msvc\output.c(58): warning C4047: '関数' : 間接参照のレベルが 'int' と 'StreamBufferHandle_t' で異なっています。
+c:\work\freertos\freertos\demo\win32-msvc\output.c(58): warning C4024: 'Substitution' : の型が 2 の仮引数および実引数と異なります。
+c:\work\freertos\freertos\demo\win32-msvc\output.c(58): warning C4013: 関数 'getCOUNT' は定義されていません。int 型の値を返す外部関数と見なします。
+c:\work\freertos\freertos\demo\win32-msvc\output.c(63): warning C4047: '関数' : 間接参照のレベルが 'int' と 'StreamBufferHandle_t' で異なっています。
+c:\work\freertos\freertos\demo\win32-msvc\output.c(63): warning C4024: 'Substitution' : の型が 2 の仮引数および実引数と異なります。
   WIN32.vcxproj -> C:\work\FreeRTOS\FreeRTOS\Demo\WIN32-MSVC\.\Debug\RTOSDemo.exe

@@ -607,7 +607,7 @@ size_t xStreamBufferSend( StreamBufferHandle_t xStreamBuffer,
                     ( void ) xTaskNotifyStateClear( NULL );
 
                     /* Should only be one writer. */
-                    configASSERT( pxStreamBuffer->xTaskWaitingToSend == NULL );
+                    //configASSERT( pxStreamBuffer->xTaskWaitingToSend == NULL );
                     pxStreamBuffer->xTaskWaitingToSend = xTaskGetCurrentTaskHandle();
                 }
                 else
