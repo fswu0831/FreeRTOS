@@ -121,16 +121,17 @@ BaseType_t xNextByte = 0;
 		Note:  An infinite block time is used to simplify the example.  Infinite
 		block times are not recommended in production code as they do not allow
 		for error recovery. */
-		xStreamBufferReceive( /* The stream buffer data is being received from. */
-							  xStreamBuffer,
-							  /* Where to place received data. */
-							  ( void * ) &( cRxBuffer[ xNextByte ] ),
-							  /* The number of bytes to receive. */
-							  sizeof( char ),
+		
+		//xStreamBufferReceive( /* The stream buffer data is being received from. */
+			//				  xStreamBuffer,
+				//			  /* Where to place received data. */
+					//		  ( void * ) &( cRxBuffer[ xNextByte ] ),
+						//	  /* The number of bytes to receive. */
+							// sizeof( char ),
 							  /* The time to wait for the next data if the buffer
 							  is empty. */
-							  portMAX_DELAY );
-
+					//		  portMAX_DELAY );
+		
 		/* If xNextByte is 0 then this task is looking for the start of the
 		string, which is 'H'. */
 		if( xNextByte == 0 )

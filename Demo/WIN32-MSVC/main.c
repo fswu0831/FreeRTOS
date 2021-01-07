@@ -11,6 +11,7 @@ should an assert get hit. */
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "output.h"
 
 
 #define mainCREATE_SIMPLE_BLINKY_DEMO_ONLY	1
@@ -31,14 +32,12 @@ choice.  See http://www.freertos.org/a00111.html for an explanation. */
  * main_full() is used when mainCREATE_SIMPLE_BLINKY_DEMO_ONLY is set to 0.
  */
 extern void main_blinky( void );
-extern void main_full( void );
 
 /*
  * Only the comprehensive demo uses application hook (callback) functions.  See
  * http://www.freertos.org/a00016.html for more information.
  */
-void vFullDemoTickHookFunction( void );
-void vFullDemoIdleFunction( void );
+
 
 /*
  * This demo uses heap_5.c, so start by defining some heap regions.  It is not
@@ -78,8 +77,7 @@ static BaseType_t xTraceRunning = pdTRUE;
 
 int main( void )
 {
-	static int i = 1;
-	static int kernel_loop_num = 3;
+
 	prvInitialiseHeap();
 
 
@@ -87,9 +85,8 @@ int main( void )
 
 	#if ( mainCREATE_SIMPLE_BLINKY_DEMO_ONLY == 1 )
 	{
-		for (i; i <= kernel_loop_num; i++) {
-			main_blinky();
-		}
+		main_blinky();
+
 	}
 	#else
 	{

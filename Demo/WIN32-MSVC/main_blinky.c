@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <stdint.h>
+#include <string.h>
 
 /* Kernel includes. */
 #include "FreeRTOS.h"
@@ -9,12 +11,18 @@
 #include "timers.h"
 #include "semphr.h"
 #include "queue.h"
+#include "message_buffer.h"
+#include "list.h"
+#include "output.h"
+
+#define BUFFER_SIZE ( ( unsigned portSHORT ) 512 ) 
+static signed portCHAR pcWriteBuffer1[BUFFER_SIZE] = { 100 };
 
 #define LOG_FILE     "LOG/log.txt"  
 FILE* log_file;
 
 /* Priorities at which the tasks are created. */
-#define main_TASK_PRIORITY_HIGH		( tskIDLE_PRIORITY + 2 )
+#define main_TASK_PRIORITY_HIGH		( tskIDLE_PRIORITY )
 #define	main_TASK_PRIORITY_LOW		( tskIDLE_PRIORITY )
 
 /* The rate at which data is sent to the queue.  The times are converted from
@@ -30,196 +38,236 @@ queue send software timer respectively. */
 #define mainVALUE_SENT_FROM_TASK			( 100UL )
 #define mainVALUE_SENT_FROM_TIMER			( 200UL )
 
-/*-----------------------------------------------------------*/
+#define NUM_TIMERS 5
+
+
+static int SEND_TASK_NUM;// = 2;  //送信タスクの数
+static int RECEIVE_TASK_NUM;// = 2;  //受信タスクの数
+static int BUFFER_NUM;
+static char YES_NO[1];
+
+static int NUMVER=5;
 
 /*
  * The tasks as described in the comments at the top of this file.
  */
-static void producer( void *pvParameters );
-static void consumer( void *pvParameters );
-//void array_push(void* ptr, int size, size_t unit_size, void* item);
-//static void consumer2(void* pvParameters);
-
-/*
- * The callback function executed when the software timer expires.
- */
-
-/*-----------------------------------------------------------*/
-
-static UBaseType_t N=5;
+static void SEND_TASK( void *pvParameters );
+static void RECEIVE_TASK( void *pvParameters );
 
 
- 
-/* The queue used by both tasks. */
-static QueueHandle_t myQueue;
 
 /* A software timer that is started from the tick hook. */
 static TimerHandle_t xTimer = NULL;
 
-static SemaphoreHandle_t sem_empty;
-static SemaphoreHandle_t sem_full;
-static SemaphoreHandle_t mutex;
-
-static int empty = 5; //3
-static int full = 0; //2
-static int mu = 0;
+//static MessageBufferHandle_t xMessageBuffer;
+static MessageBufferHandle_t xMessageBuffer[5];
+static const size_t xMessageBufferSizeBytes = 2048;
 
 
-static int buffer = 0; //資源の初期値
+/* Timerに関する関数など */
 
-static int work_num=100; //消費者のループ回数
-//static int work_num_producer = 100; //生産者のループ回数
+TimerHandle_t xTimers[NUM_TIMERS];
 
-static int count=1;
-static int i = 0;//CSV保存のための変数
-
-static char myTxBuff[5] ;
-static char myRxBuff[5] ;
-
-
-/*---------CSVに保存するための関数など------------*/
-/*
-typedef struct {
-	int x, y;
-}Vector;
-
-static Vector* ary = (Vector*)malloc(sizeof(Vector) * 100);
-
-static void save_csv(void) {
-	FILE* fp;
-	if ((fp = fopen("data.csv", "w")) != NULL) {
-		for (i; i < work_num; i++) {
-			fprintf(fp, "%d,%d\n", ary[i].x, ary[i].y);
-		}
-		fclose(fp);
+void vTimerCallback(TimerHandle_t xTimer)
+{
+	const uint32_t ulMaxExpiryCountBeforeStopping = 1;
+	uint32_t ulCount;
+	ulCount = (uint32_t)pvTimerGetTimerID(xTimer);
+	ulCount++;
+	if (ulCount >= ulMaxExpiryCountBeforeStopping)
+	{
+		xTimerStop(xTimer, 0);
+		printf("kernel停止\n");
+		export_csv(SEND_TASK_NUM, RECEIVE_TASK_NUM, BUFFER_NUM);//シーケンスの出力
+		vTaskEndScheduler();
 	}
-	return 0;
+	else
+	{
+		vTimerSetTimerID(xTimer, (void*)ulCount);
+	}
+}
+
+static int COUNT[100];
+
+int getCOUNT(int i) {
+	return COUNT[i];
+}
+
+void incrementCOUNT(int i) {
+	COUNT[i] += 1;
+
+}
+
+void setCOUNT(int i,int j) {
+	COUNT[i] = j;
 }
 
 
-*/
-/*---------CSVに保存するための関数など------------*/
+static int k;
+static char T[200];
 
 
 static void create_object(void) {
 	/* Start the two tasks as described in the comments at the top of this
 	file. */
-	xTaskCreate(producer,			/* The function that implements the task. */
-		"pro1", 							/* The text name assigned to the task - for debug only as it is not used by the kernel. */
-		configMINIMAL_STACK_SIZE, 		/* The size of the stack to allocate to the task. */
-		NULL, 							/* The parameter passed to the task - not used in this simple case. */
-		main_TASK_PRIORITY_HIGH,/* The priority assigned to the task. */
-		NULL);							/* The task handle is not required, so NULL is passed. */
+	//static int index_send[i];
+	//static int index_receive[j];
+	uint8_t i;
+	uint8_t j;
 
-	xTaskCreate(consumer, "con1", configMINIMAL_STACK_SIZE, NULL, main_TASK_PRIORITY_LOW, NULL);
-	//xTaskCreate(consumer2, "con2", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL);
+	for (i=1; i <= SEND_TASK_NUM; i++) {
+		//T= (char*)i;
+		printf(".");
+		k = sprintf(T, "%d", i);
 
-	//creating resouses
-	sem_empty = xSemaphoreCreateCounting(N, N); //N
-	sem_full = xSemaphoreCreateCounting(N, 0);  //0
-	mutex = xSemaphoreCreateMutex();
+		xTaskCreate(RECEIVE_TASK, T, configMINIMAL_STACK_SIZE, NULL, main_TASK_PRIORITY_HIGH, NULL);
+
+		printf("%d", uxTaskGetNumberOfTasks());
+		
+	}
+
+	for (j= SEND_TASK_NUM+1; j <= RECEIVE_TASK_NUM+ SEND_TASK_NUM; j++) {
+		printf(".");
+		k = sprintf(T, "%d", j);
+		
+		xTaskCreate(SEND_TASK, T, configMINIMAL_STACK_SIZE, NULL, main_TASK_PRIORITY_HIGH, NULL);
+		
+		printf("%d", uxTaskGetNumberOfTasks());
+	}
+
+	for (i = 0; i < BUFFER_NUM; i++) {
+		xMessageBuffer[i] = xMessageBufferCreate(xMessageBufferSizeBytes);
+	}
+	
+	//printf("%d", uxTaskGetNumberOfTasks());
+	for (i = 0; i <= SEND_TASK_NUM + RECEIVE_TASK_NUM + 1; i++) {
+		COUNT[i] = 0;
+	}
+
+	xTimer = xTimerCreate("Timer", 100, pdTRUE, (void*)0, vTimerCallback);
+	xTimerStart(xTimer, 0);
 }
 
 
 void main_blinky( void )
-{
+{		
+	printf("バッファーの数:");
+	scanf("%d", &BUFFER_NUM);
+	printf("送信タスクの数:");
+	scanf("%d", &SEND_TASK_NUM);
+	printf("受信タスクの数:");
+	scanf("%d", &RECEIVE_TASK_NUM);
+	printf("kernelを起動します(y/n):");
+	//scanf("%s", &YES_NO);
+	YES_NO[0]="y";
+	if (strcmp("y",YES_NO)==0 || strcmp("Y", YES_NO) == 0) {
+		printf("オブジェクト作成");
 		create_object();
+		printf("OK\n");
+			//vTaskStartTrace(pcWriteBuffer1, BUFFER_SIZE);
+		printf("kernel起動\n");
+		printf("実行中");
 		vTaskStartScheduler();
-		printf("finish this kernel\n");
+	}
+	else if (strcmp("n", YES_NO) == 0 || strcmp("N", YES_NO) == 0) {
+		printf("中断しました\n");
+	}
+	else {
+		printf("オブジェクト作成");
+		create_object();
+		printf("\nkernel起動\n");
+		printf("実行中");
+		vTaskStartScheduler();
+	}
 }
 /*-----------------------------------------------------------*/
 
+/*メッセージバッファのための変数*/
+
+uint8_t ucArrayToSend[] = { 0,1};
+size_t xBytesSent;
+static const TickType_t x100ms = pdMS_TO_TICKS(100);
 
 
-static void producer( void *pvParameters )
+uint8_t ucRxData[2000];
+size_t xReceivedBytes;
+const TickType_t xBlockTime = pdMS_TO_TICKS(20);
+
+static void check_task_num() {
+
+	if (TRUE) {
+	//if (uxTaskGetNumberOfTasks()-2 <= 2) {
+		printf("kernel停止\n");
+		export_csv(SEND_TASK_NUM, RECEIVE_TASK_NUM,NUMVER);//シーケンスの出力
+		vTaskEndScheduler();
+	}
+	printf("-");
+}
+//====Bufferが1つのとき====
+
+
+static void SEND_TASK(void* pvParameters)
 {
-	( void ) pvParameters;
-	myQueue = xQueueCreate(N, sizeof(myTxBuff));
-	//xQueCreate(5,sizeof())//
+	(void)pvParameters;
 
-	for(count; count <=work_num; count++)
+
+	while (1)
 	{
+		TaskHandle_t tskHand_send;
+		uint8_t i;
 
-		if (sem_empty != NULL) {
-			if (xSemaphoreTake(sem_empty, (TickType_t)0xFFFFFFFF) == pdTRUE) {
-				empty--;
-				if (mutex != NULL) {
-					if (xSemaphoreTake(mutex, (TickType_t)0xFFFFFFFF) == pdTRUE){
-						//insert item
-						sprintf(myTxBuff, "item");
-						xQueueSend(myQueue, (void*)myTxBuff, (TickType_t)0);
-						printf("==================================\n");
-						printf("producer:%d\n", count);
-						printf("waiting to be read:%d\n", uxQueueMessagesWaiting(myQueue));
-						printf("available spases  :%d\n", uxQueueSpacesAvailable(myQueue));
-						printf("==================================\n\n");
-						xSemaphoreGive(mutex);
-					}
-					else {
-						xSemaphoreGive(sem_empty);
-						//mutex取れなかった時→基本的にここにはこない
-					}
+		for (i = 0; i < BUFFER_NUM; i++) {
+			tskHand_send = xTaskGetCurrentTaskHandle();
+			xBytesSent = xMessageBufferSend(xMessageBuffer[i], (void*)ucArrayToSend, sizeof(ucArrayToSend), x100ms, tskHand_send);
 
-				}
-				else {
-					//mutexが取られている
-				}
-				xSemaphoreGive(sem_full);
+			if (xBytesSent != sizeof(ucArrayToSend)) {
+				//dont have enough space
+				printf("not enough send spase\n");
 			}
 			else {
-				//セマフォ取れなかった→基本的にここにはこない
+				//printf("send:%d\n", getCOUNT(atoi(pcTaskGetName(tskHand_send))));
 			}
+
 		}
-		else {
-			//セマフォがない
-		}
+		printf(".");
 		vTaskDelay(10);
+
 	}
-	vTaskEndScheduler();
+
+	//vTaskEndScheduler();
 }
 
 
-static void consumer( void *pvParameters )
+static void RECEIVE_TASK(void* pvParameters)
 {
-	( void ) pvParameters;
-	for (count; count <= work_num; count++)
+	(void)pvParameters;
+
+	while (1)
 	{
-		
-		if (sem_full != NULL) {
-			if (xSemaphoreTake(sem_full, (TickType_t)0xFFFFFFFF) == pdTRUE) { //(TickType_t)0) == pdTRUE
-				full--;
-				if (mutex != NULL) {
-					if (xSemaphoreTake(mutex, (TickType_t)0xFFFFFFFF) == pdTRUE) {
-						xQueueReceive(myQueue, (void*)myRxBuff,(TickType_t) 5 );
-						printf("==================================\n");
-						printf("consumer:%d\n", count);
-						printf("waiting to be read:%d\n", uxQueueMessagesWaiting(myQueue));
-						printf("available spases  :%d\n", uxQueueSpacesAvailable(myQueue));
-						printf("==================================\n\n");
-						xSemaphoreGive(mutex);
-					}
-					else {
-						xSemaphoreGive(sem_full);
-						//mutex取れなかった時→基本的にここにはこない
-					}
+		TaskHandle_t tskHand_res;
+		uint8_t i;
 
+		for (i = 0; i < BUFFER_NUM; i++) {
+			tskHand_res = xTaskGetCurrentTaskHandle();
+			xReceivedBytes = xMessageBufferReceive(xMessageBuffer[i], (void*)ucRxData, sizeof(ucRxData), xBlockTime, tskHand_res);
 
-				}
-				else {
-					//mutexが取られている
-				}
-				xSemaphoreGive(sem_empty);
+			if (xReceivedBytes > 0) {
+				//printf("send:%d\n",getCOUNT(atoi(pcTaskGetName(tskHand_res))));
 			}
 			else {
-				//セマフォ取れなかった→基本的にここにはこない
+				printf("ERROR\n");
 			}
 
 		}
-		else {
-			//セマフォがない
-		}
 
+		printf(".");
 		vTaskDelay(10);
 	}
-	vTaskEndScheduler();
+
+	//vTaskEndScheduler();
 }
+
+
+
+
+
