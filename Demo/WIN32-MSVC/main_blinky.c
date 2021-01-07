@@ -38,9 +38,12 @@ queue send software timer respectively. */
 #define mainVALUE_SENT_FROM_TASK			( 100UL )
 #define mainVALUE_SENT_FROM_TIMER			( 200UL )
 
+#define NUM_TIMERS 5
+
 
 static int SEND_TASK_NUM;// = 2;  //送信タスクの数
 static int RECEIVE_TASK_NUM;// = 2;  //受信タスクの数
+static int BUFFER_NUM;
 static char YES_NO[1];
 
 static int NUMVER=5;
@@ -52,15 +55,37 @@ static void SEND_TASK( void *pvParameters );
 static void RECEIVE_TASK( void *pvParameters );
 
 
+
 /* A software timer that is started from the tick hook. */
 static TimerHandle_t xTimer = NULL;
 
 //static MessageBufferHandle_t xMessageBuffer;
-static MessageBufferHandle_t xMessageBuffer;
-static MessageBufferHandle_t yMessageBuffer;
+static MessageBufferHandle_t xMessageBuffer[5];
 static const size_t xMessageBufferSizeBytes = 2048;
 
 
+/* Timerに関する関数など */
+
+TimerHandle_t xTimers[NUM_TIMERS];
+
+void vTimerCallback(TimerHandle_t xTimer)
+{
+	const uint32_t ulMaxExpiryCountBeforeStopping = 1;
+	uint32_t ulCount;
+	ulCount = (uint32_t)pvTimerGetTimerID(xTimer);
+	ulCount++;
+	if (ulCount >= ulMaxExpiryCountBeforeStopping)
+	{
+		xTimerStop(xTimer, 0);
+		printf("kernel停止\n");
+		export_csv(SEND_TASK_NUM, RECEIVE_TASK_NUM, BUFFER_NUM);//シーケンスの出力
+		vTaskEndScheduler();
+	}
+	else
+	{
+		vTimerSetTimerID(xTimer, (void*)ulCount);
+	}
+}
 
 static int COUNT[100];
 
@@ -94,7 +119,9 @@ static void create_object(void) {
 		//T= (char*)i;
 		printf(".");
 		k = sprintf(T, "%d", i);
+
 		xTaskCreate(RECEIVE_TASK, T, configMINIMAL_STACK_SIZE, NULL, main_TASK_PRIORITY_HIGH, NULL);
+
 		printf("%d", uxTaskGetNumberOfTasks());
 		
 	}
@@ -102,21 +129,30 @@ static void create_object(void) {
 	for (j= SEND_TASK_NUM+1; j <= RECEIVE_TASK_NUM+ SEND_TASK_NUM; j++) {
 		printf(".");
 		k = sprintf(T, "%d", j);
-		xTaskCreate(SEND_TASK, T , configMINIMAL_STACK_SIZE, NULL, main_TASK_PRIORITY_HIGH, NULL);
+		
+		xTaskCreate(SEND_TASK, T, configMINIMAL_STACK_SIZE, NULL, main_TASK_PRIORITY_HIGH, NULL);
+		
 		printf("%d", uxTaskGetNumberOfTasks());
 	}
 
-	xMessageBuffer = xMessageBufferCreate(xMessageBufferSizeBytes);
-	yMessageBuffer = xMessageBufferCreate(xMessageBufferSizeBytes);
+	for (i = 0; i < BUFFER_NUM; i++) {
+		xMessageBuffer[i] = xMessageBufferCreate(xMessageBufferSizeBytes);
+	}
+	
 	//printf("%d", uxTaskGetNumberOfTasks());
 	for (i = 0; i <= SEND_TASK_NUM + RECEIVE_TASK_NUM + 1; i++) {
 		COUNT[i] = 0;
 	}
+
+	xTimer = xTimerCreate("Timer", 100, pdTRUE, (void*)0, vTimerCallback);
+	xTimerStart(xTimer, 0);
 }
 
 
 void main_blinky( void )
 {		
+	printf("バッファーの数:");
+	scanf("%d", &BUFFER_NUM);
 	printf("送信タスクの数:");
 	scanf("%d", &SEND_TASK_NUM);
 	printf("受信タスクの数:");
@@ -158,111 +194,80 @@ size_t xReceivedBytes;
 const TickType_t xBlockTime = pdMS_TO_TICKS(20);
 
 static void check_task_num() {
-	printf("%d", uxTaskGetNumberOfTasks() - 2);
-	//printf("%s",vTaskList(pcWriteBuffer1));
-	//printf("Task Number:%d\n", uxTaskGetNumberOfTasks());
-	if (uxTaskGetNumberOfTasks()-2 <= 2) {
+
+	if (TRUE) {
+	//if (uxTaskGetNumberOfTasks()-2 <= 2) {
 		printf("kernel停止\n");
 		export_csv(SEND_TASK_NUM, RECEIVE_TASK_NUM,NUMVER);//シーケンスの出力
 		vTaskEndScheduler();
 	}
 	printf("-");
 }
+//====Bufferが1つのとき====
 
-static void SEND_TASK( void *pvParameters )
+
+static void SEND_TASK(void* pvParameters)
 {
-	( void ) pvParameters;
-	
+	(void)pvParameters;
 
-	while(1)
+
+	while (1)
 	{
 		TaskHandle_t tskHand_send;
+		uint8_t i;
 
-		tskHand_send = xTaskGetCurrentTaskHandle();
-		xBytesSent = xMessageBufferSend(xMessageBuffer, (void *)ucArrayToSend, sizeof(ucArrayToSend), x100ms, tskHand_send);
+		for (i = 0; i < BUFFER_NUM; i++) {
+			tskHand_send = xTaskGetCurrentTaskHandle();
+			xBytesSent = xMessageBufferSend(xMessageBuffer[i], (void*)ucArrayToSend, sizeof(ucArrayToSend), x100ms, tskHand_send);
 
-		if (xBytesSent != sizeof(ucArrayToSend)) {
-			//dont have enough space
-			printf("not enough send spase\n");
-		}
-		else {
-			//printf("send:%d\n", getCOUNT(atoi(pcTaskGetName(tskHand_send))));
-		}
+			if (xBytesSent != sizeof(ucArrayToSend)) {
+				//dont have enough space
+				printf("not enough send spase\n");
+			}
+			else {
+				//printf("send:%d\n", getCOUNT(atoi(pcTaskGetName(tskHand_send))));
+			}
 
-
-		printf(".");
-		vTaskDelay(10);
-
-		tskHand_send = xTaskGetCurrentTaskHandle();
-		xBytesSent = xMessageBufferSend(yMessageBuffer, (void*)ucArrayToSend, sizeof(ucArrayToSend), x100ms, tskHand_send);
-		
-
-		if (xBytesSent != sizeof(ucArrayToSend)) {
-			//dont have enough space
-			printf("not enough send spase\n");
-		}
-		else {
-			//printf("send:%d\n", getCOUNT(atoi(pcTaskGetName(tskHand_send))));
-		}
-		if (getCOUNT(atoi(pcTaskGetName(tskHand_send))) >= NUMVER) {
-			
-			check_task_num();
-			vTaskDelete(tskHand_send);
-			
 		}
 		printf(".");
 		vTaskDelay(10);
+
 	}
-	
+
 	//vTaskEndScheduler();
 }
 
 
-static void RECEIVE_TASK( void *pvParameters )
+static void RECEIVE_TASK(void* pvParameters)
 {
-	( void ) pvParameters;
+	(void)pvParameters;
 
 	while (1)
 	{
 		TaskHandle_t tskHand_res;
-		
-		tskHand_res = xTaskGetCurrentTaskHandle();
-		xReceivedBytes = xMessageBufferReceive(xMessageBuffer, (void*)ucRxData, sizeof(ucRxData), xBlockTime, tskHand_res);
+		uint8_t i;
 
-		if (xReceivedBytes > 0) {
-			//printf("send:%d\n",getCOUNT(atoi(pcTaskGetName(tskHand_res))));
-		}
-		else {
-			printf("ERROR\n");
+		for (i = 0; i < BUFFER_NUM; i++) {
+			tskHand_res = xTaskGetCurrentTaskHandle();
+			xReceivedBytes = xMessageBufferReceive(xMessageBuffer[i], (void*)ucRxData, sizeof(ucRxData), xBlockTime, tskHand_res);
+
+			if (xReceivedBytes > 0) {
+				//printf("send:%d\n",getCOUNT(atoi(pcTaskGetName(tskHand_res))));
+			}
+			else {
+				printf("ERROR\n");
+			}
+
 		}
 
 		printf(".");
 		vTaskDelay(10);
-
-		tskHand_res = xTaskGetCurrentTaskHandle();
-		xReceivedBytes = xMessageBufferReceive(yMessageBuffer, (void*)ucRxData, sizeof(ucRxData), xBlockTime, tskHand_res);
-
-		if (xReceivedBytes > 0) {
-			//printf("send:%d\n",getCOUNT(atoi(pcTaskGetName(tskHand_res))));
-		}
-		else {
-			printf("ERROR\n");
-		}
-
-
-		if (getCOUNT(atoi(pcTaskGetName(tskHand_res))) >= NUMVER) {
-			
-			check_task_num();
-			vTaskDelete(tskHand_res);
-		}
-		printf(".");
-		vTaskDelay(10);
-
-
 	}
-	
+
 	//vTaskEndScheduler();
 }
-//回数取得用
-//動いているバッファを取得
+
+
+
+
 

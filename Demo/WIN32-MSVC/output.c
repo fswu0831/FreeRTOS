@@ -18,8 +18,8 @@
 
 #define MAX_NUM (1000)
 
-static char FILE_NAME_1[30];
-static char FILE_NAME_2[30];
+static char FILE_NAME_1[40];
+static char FILE_NAME_2[40];
 
 typedef struct{
 	char THREAD[5];
@@ -66,15 +66,14 @@ extern void append_row(StreamBufferHandle_t xStreamBuffer,char event_type[6], Ta
 }
 
 
-extern void export_csv(int SEND_TASK_NUM, int RECEIVE_TASK_NUM, int NUMVER) {
+extern void export_csv(int SEND_TASK_NUM, int RECEIVE_TASK_NUM, int BUFFER_NUM) {
 
 	FILE* fr;
 	FILE* fs;
 	uint8_t i, j;
 
-
-	sprintf(FILE_NAME_1, "LOG2/recv-task-%d-loop-%d.csv", SEND_TASK_NUM,NUMVER);
-	sprintf(FILE_NAME_2, "LOG2/send-task-%d-loop-%d.csv", RECEIVE_TASK_NUM, NUMVER);
+	sprintf(FILE_NAME_1, "LOG2/recv-task-%d-buffer-%d.csv", SEND_TASK_NUM, BUFFER_NUM);
+	sprintf(FILE_NAME_2, "LOG2/send-task-%d-buffer-%d.csv", RECEIVE_TASK_NUM, BUFFER_NUM);
 
 	if ((fr = fopen(FILE_NAME_1, "w")) == NULL){
 		printf("receiveイベントのログの出力に失敗しました");
