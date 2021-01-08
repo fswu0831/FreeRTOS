@@ -46,13 +46,13 @@ static int RECEIVE_TASK_NUM;// = 2;  //受信タスクの数
 static int BUFFER_NUM;
 static char YES_NO[1];
 
-static int NUMVER=5;
+static int NUMVER = 5;
 
 /*
  * The tasks as described in the comments at the top of this file.
  */
-static void SEND_TASK( void *pvParameters );
-static void RECEIVE_TASK( void *pvParameters );
+static void SEND_TASK(void* pvParameters);
+static void RECEIVE_TASK(void* pvParameters);
 
 
 
@@ -98,7 +98,7 @@ void incrementCOUNT(int i) {
 
 }
 
-void setCOUNT(int i,int j) {
+void setCOUNT(int i, int j) {
 	COUNT[i] = j;
 }
 
@@ -115,7 +115,7 @@ static void create_object(void) {
 	uint8_t i;
 	uint8_t j;
 
-	for (i=1; i <= SEND_TASK_NUM; i++) {
+	for (i = 1; i <= SEND_TASK_NUM; i++) {
 		//T= (char*)i;
 		printf(".");
 		k = sprintf(T, "%d", i);
@@ -123,34 +123,34 @@ static void create_object(void) {
 		xTaskCreate(RECEIVE_TASK, T, configMINIMAL_STACK_SIZE, NULL, main_TASK_PRIORITY_HIGH, NULL);
 
 		printf("%d", uxTaskGetNumberOfTasks());
-		
+
 	}
 
-	for (j= SEND_TASK_NUM+1; j <= RECEIVE_TASK_NUM+ SEND_TASK_NUM; j++) {
+	for (j = SEND_TASK_NUM + 1; j <= RECEIVE_TASK_NUM + SEND_TASK_NUM; j++) {
 		printf(".");
 		k = sprintf(T, "%d", j);
-		
+
 		xTaskCreate(SEND_TASK, T, configMINIMAL_STACK_SIZE, NULL, main_TASK_PRIORITY_HIGH, NULL);
-		
+
 		printf("%d", uxTaskGetNumberOfTasks());
 	}
 
 	for (i = 0; i < BUFFER_NUM; i++) {
 		xMessageBuffer[i] = xMessageBufferCreate(xMessageBufferSizeBytes);
 	}
-	
+
 	//printf("%d", uxTaskGetNumberOfTasks());
 	for (i = 0; i <= SEND_TASK_NUM + RECEIVE_TASK_NUM + 1; i++) {
 		COUNT[i] = 0;
 	}
 
-	xTimer = xTimerCreate("Timer", 100, pdTRUE, (void*)0, vTimerCallback);
+	xTimer = xTimerCreate("Timer", 40, pdTRUE, (void*)0, vTimerCallback);
 	xTimerStart(xTimer, 0);
 }
 
 
-void main_blinky( void )
-{		
+void main_blinky(void)
+{
 	printf("バッファーの数:");
 	scanf("%d", &BUFFER_NUM);
 	printf("送信タスクの数:");
@@ -159,12 +159,12 @@ void main_blinky( void )
 	scanf("%d", &RECEIVE_TASK_NUM);
 	printf("kernelを起動します(y/n):");
 	//scanf("%s", &YES_NO);
-	YES_NO[0]="y";
-	if (strcmp("y",YES_NO)==0 || strcmp("Y", YES_NO) == 0) {
+	YES_NO[0] = "y";
+	if (strcmp("y", YES_NO) == 0 || strcmp("Y", YES_NO) == 0) {
 		printf("オブジェクト作成");
 		create_object();
 		printf("OK\n");
-			//vTaskStartTrace(pcWriteBuffer1, BUFFER_SIZE);
+		//vTaskStartTrace(pcWriteBuffer1, BUFFER_SIZE);
 		printf("kernel起動\n");
 		printf("実行中");
 		vTaskStartScheduler();
@@ -184,7 +184,7 @@ void main_blinky( void )
 
 /*メッセージバッファのための変数*/
 
-uint8_t ucArrayToSend[] = { 0,1};
+uint8_t ucArrayToSend[] = { 0,1 };
 size_t xBytesSent;
 static const TickType_t x100ms = pdMS_TO_TICKS(100);
 
@@ -196,9 +196,9 @@ const TickType_t xBlockTime = pdMS_TO_TICKS(20);
 static void check_task_num() {
 
 	if (TRUE) {
-	//if (uxTaskGetNumberOfTasks()-2 <= 2) {
+		//if (uxTaskGetNumberOfTasks()-2 <= 2) {
 		printf("kernel停止\n");
-		export_csv(SEND_TASK_NUM, RECEIVE_TASK_NUM,NUMVER);//シーケンスの出力
+		export_csv(SEND_TASK_NUM, RECEIVE_TASK_NUM, NUMVER);//シーケンスの出力
 		vTaskEndScheduler();
 	}
 	printf("-");

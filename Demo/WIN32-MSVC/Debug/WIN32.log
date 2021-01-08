@@ -1,7 +1,19 @@
-﻿  output.c
-c:\work\freertos\freertos\source\include\task.h(2591): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
-c:\work\freertos\freertos\source\include\task.h(2591): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
-c:\work\freertos\freertos\source\include\task.h(2591): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
+﻿  port.c
+c:\work\freertos\freertos\source\include\task.h(2541): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
+  main_blinky.c
+c:\work\freertos\freertos\source\include\task.h(2541): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
+c:\work\freertos\freertos\source\include\task.h(2541): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
+c:\work\freertos\freertos\source\include\task.h(2541): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(81): warning C4013: 関数 'export_csv' は定義されていません。int 型の値を返す外部関数と見なします。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(129): warning C4244: '=' : 'int' から 'uint8_t' への変換です。データが失われる可能性があります。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(162): warning C4047: '=' : 間接参照のレベルが 'char' と 'char [2]' で異なっています。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(198): warning C4127: 条件式が定数です。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(214): warning C4127: 条件式が定数です。
+c:\work\freertos\freertos\demo\win32-msvc\main_blinky.c(245): warning C4127: 条件式が定数です。
+  output.c
+c:\work\freertos\freertos\source\include\task.h(2541): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
+c:\work\freertos\freertos\source\include\task.h(2541): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
+c:\work\freertos\freertos\source\include\task.h(2541): warning C4819: ファイルは、現在のコード ページ (932) で表示できない文字を含んでいます。データの損失を防ぐために、ファイルを Unicode 形式で保存してください。
 c:\work\freertos\freertos\demo\win32-msvc\output.c(52): warning C4244: '初期化中' : 'int' から 'uint8_t' への変換です。データが失われる可能性があります。
 c:\work\freertos\freertos\demo\win32-msvc\output.c(55): warning C4013: 関数 'incrementCOUNT' は定義されていません。int 型の値を返す外部関数と見なします。
 c:\work\freertos\freertos\demo\win32-msvc\output.c(58): warning C4047: '関数' : 間接参照のレベルが 'int' と 'StreamBufferHandle_t' で異なっています。
@@ -9,4 +21,6 @@ c:\work\freertos\freertos\demo\win32-msvc\output.c(58): warning C4024: 'Substitu
 c:\work\freertos\freertos\demo\win32-msvc\output.c(58): warning C4013: 関数 'getCOUNT' は定義されていません。int 型の値を返す外部関数と見なします。
 c:\work\freertos\freertos\demo\win32-msvc\output.c(63): warning C4047: '関数' : 間接参照のレベルが 'int' と 'StreamBufferHandle_t' で異なっています。
 c:\work\freertos\freertos\demo\win32-msvc\output.c(63): warning C4024: 'Substitution' : の型が 2 の仮引数および実引数と異なります。
+  コードを生成中...
+  LINK : 前回のインクリメンタル リンクで .\Debug/RTOSDemo.exe が見つからなかったか、ビルドされませんでした。フル リンクを行います。
   WIN32.vcxproj -> C:\work\FreeRTOS\FreeRTOS\Demo\WIN32-MSVC\.\Debug\RTOSDemo.exe
