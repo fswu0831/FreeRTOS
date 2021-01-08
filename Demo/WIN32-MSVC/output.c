@@ -46,6 +46,27 @@ SEQUENCE Substitution(char thread[5], int port, char event1[5], int index) {
 	return s;
 }
 
+extern void reset_data() {
+	uint8_t i;
+	r_count = 0;
+	s_count = 0;
+	for (i = 0; i < MAX_NUM; i++) {
+		if (Qr[i].PORT == 0) {
+			break;
+		}
+		else {
+			Qr[i] = Substitution("", 0, "", 0);
+		}
+	}
+	for (i = 0; i < MAX_NUM; i++) {
+		if (Qs[i].PORT == 0) {
+			break;
+		}
+		else {
+			Qs[i] = Substitution("", 0, "", 0);
+		}
+	}
+}
 
 
 extern void append_row(StreamBufferHandle_t xStreamBuffer,char event_type[6], TaskHandle_t xTaskHandle) {
@@ -72,8 +93,8 @@ extern void export_csv(int SEND_TASK_NUM, int RECEIVE_TASK_NUM, int BUFFER_NUM) 
 	FILE* fs;
 	uint8_t i, j;
 
-	sprintf(FILE_NAME_1, "LOG2/recv-task-%d-buffer-%d.csv", SEND_TASK_NUM, BUFFER_NUM);
-	sprintf(FILE_NAME_2, "LOG2/send-task-%d-buffer-%d.csv", RECEIVE_TASK_NUM, BUFFER_NUM);
+	sprintf(FILE_NAME_1, "LOG/recv-task-%d-buffer-%d.csv", SEND_TASK_NUM, BUFFER_NUM);
+	sprintf(FILE_NAME_2, "LOG/send-task-%d-buffer-%d.csv", RECEIVE_TASK_NUM, BUFFER_NUM);
 
 	if ((fr = fopen(FILE_NAME_1, "w")) == NULL){
 		printf("receiveイベントのログの出力に失敗しました");
@@ -112,7 +133,6 @@ extern void export_csv(int SEND_TASK_NUM, int RECEIVE_TASK_NUM, int BUFFER_NUM) 
 		printf("%s に結果が出力されました\n\n", FILE_NAME_2);
 		fclose(fs);
 	}
-
 }
 
 

@@ -117,7 +117,7 @@ void vApplicationMallocFailedHook( void )
 	(although it does not provide information on how the remaining heap might be
 	fragmented).  See http://www.freertos.org/a00111.html for more
 	information. */
-	vAssertCalled( __LINE__, __FILE__ );
+//	vAssertCalled( __LINE__, __FILE__ );
 }
 /*-----------------------------------------------------------*/
 
@@ -225,7 +225,7 @@ volatile uint32_t ulSetToNonZeroInDebuggerToContinue = 0;
 		}
 
 		/* Cause debugger break point if being debugged. */
-		__debugbreak();
+		//__debugbreak();
 
 		/* You can step out of this function to debug the assertion by using
 		the debugger to set ulSetToNonZeroInDebuggerToContinue to a non-zero
